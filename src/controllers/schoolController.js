@@ -21,6 +21,19 @@ const addSchool = async (req, res, next) => {
     const { name, address, latitude, longitude } = req.body;
 
     const pool = getPool();
+
+    const [existing] = await pool.query(
+      'SELECT id FROM schools WHERE name = ? AND address = ?',
+      [name.trim(), address.trim()]
+    );
+
+    if (existing.length > 0) {
+      return res.status(409).json({
+        status: 'error',
+        message: 'A school with the same name and address already exists',
+      });
+    }
+
     const [result] = await pool.query(
       'INSERT INTO schools (name, address, latitude, longitude) VALUES (?, ?, ?, ?)',
       [name.trim(), address.trim(), latitude, longitude]
