@@ -8,7 +8,7 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:3000",
+      "value": "https://school-management-api-production-dc16.up.railway.app",
       "type": "string"
     }
   ],
