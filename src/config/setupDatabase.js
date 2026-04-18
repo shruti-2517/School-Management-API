@@ -1,4 +1,4 @@
-require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
+require('dotenv').config();
 const mysql = require('mysql2/promise');
 
 async function setup() {
@@ -47,10 +47,10 @@ async function setup() {
     console.log('Database setup complete. You can now start the server.');
   } catch (err) {
     console.error('Database setup failed:', err.message);
-    process.exit(1);
+    throw err;
   } finally {
     if (connection) await connection.end();
   }
 }
 
-setup();
+module.exports = setup;
