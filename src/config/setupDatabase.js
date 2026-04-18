@@ -5,19 +5,17 @@ async function setup() {
   let connection;
 
   try {
+    const dbName = process.env.DB_NAME || 'school_management';
+
     connection = await mysql.createConnection({
       host: process.env.DB_HOST || 'localhost',
       port: process.env.DB_PORT || 3306,
       user: process.env.DB_USER || 'root',
       password: process.env.DB_PASSWORD || '',
+      database: dbName,
     });
 
-    const dbName = process.env.DB_NAME || 'school_management';
-
-    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\``);
-    console.log(`Database "${dbName}" created or already exists`);
-
-    await connection.query(`USE \`${dbName}\``);
+    console.log(`Connected to database "${dbName}"`);
 
     await connection.query(`
       CREATE TABLE IF NOT EXISTS schools (
