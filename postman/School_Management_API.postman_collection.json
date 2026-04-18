@@ -1,0 +1,532 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "School Management API",
+    "description": "Postman collection for the School Management API.\n\nEndpoints:\n- POST /addSchool — Add a new school\n- GET /listSchools?latitude=&longitude= — List schools sorted by proximity\n- GET /health — Health check\n\nSet the baseUrl variable to your server address (default: http://localhost:3000).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Check if the server is running."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has status ok', function () {",
+                  "    var body = pm.response.json();",
+                  "    pm.expect(body.status).to.equal('ok');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/health",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["health"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"status\": \"ok\",\n  \"message\": \"Server is running\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Add School",
+      "item": [
+        {
+          "name": "Add School - Success",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Kendriya Vidyalaya No. 1\",\n  \"address\": \"Salt Lake, Kolkata, West Bengal 700064\",\n  \"latitude\": 22.5726,\n  \"longitude\": 88.3639\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/addSchool",
+              "host": ["{{baseUrl}}"],
+              "path": ["addSchool"]
+            },
+            "description": "Adds a new school. All four fields are required.\n\nFields:\n- name (string)\n- address (string)\n- latitude (number, -90 to 90)\n- longitude (number, -180 to 180)"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has success status', function () {",
+                  "    var body = pm.response.json();",
+                  "    pm.expect(body.status).to.equal('success');",
+                  "});",
+                  "",
+                  "pm.test('Response contains school data with id', function () {",
+                  "    var body = pm.response.json();",
+                  "    pm.expect(body.data).to.be.an('object');",
+                  "    pm.expect(body.data.id).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Kendriya Vidyalaya No. 1\",\n  \"address\": \"Salt Lake, Kolkata, West Bengal 700064\",\n  \"latitude\": 22.5726,\n  \"longitude\": 88.3639\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": { "raw": "{{baseUrl}}/addSchool", "host": ["{{baseUrl}}"], "path": ["addSchool"] }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"School added successfully\",\n  \"data\": {\n    \"id\": 6,\n    \"name\": \"Kendriya Vidyalaya No. 1\",\n    \"address\": \"Salt Lake, Kolkata, West Bengal 700064\",\n    \"latitude\": 22.5726,\n    \"longitude\": 88.3639\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Add School - Missing Name",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\",\n  \"address\": \"Salt Lake, Kolkata\",\n  \"latitude\": 22.5726,\n  \"longitude\": 88.3639\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/addSchool",
+              "host": ["{{baseUrl}}"],
+              "path": ["addSchool"]
+            },
+            "description": "Sends an empty name. Should return 422 with a validation error."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 422', function () {",
+                  "    pm.response.to.have.status(422);",
+                  "});",
+                  "",
+                  "pm.test('Error is on the name field', function () {",
+                  "    var errors = pm.response.json().errors;",
+                  "    var nameError = errors.find(function(e) { return e.field === 'name'; });",
+                  "    pm.expect(nameError).to.not.be.undefined;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "422 Validation Error",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Validation failed\",\n  \"errors\": [\n    { \"field\": \"name\", \"message\": \"Name is required\" }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Add School - Missing All Fields",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/addSchool",
+              "host": ["{{baseUrl}}"],
+              "path": ["addSchool"]
+            },
+            "description": "Sends an empty body. Should return 422 with errors for all four fields."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 422', function () {",
+                  "    pm.response.to.have.status(422);",
+                  "});",
+                  "",
+                  "pm.test('Errors array has 4 items', function () {",
+                  "    var body = pm.response.json();",
+                  "    pm.expect(body.errors).to.have.lengthOf(4);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "422 Validation Error",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Validation failed\",\n  \"errors\": [\n    { \"field\": \"name\",      \"message\": \"Name is required\" },\n    { \"field\": \"address\",   \"message\": \"Address is required\" },\n    { \"field\": \"latitude\",  \"message\": \"Latitude is required\" },\n    { \"field\": \"longitude\", \"message\": \"Longitude is required\" }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Add School - Invalid Coordinates",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test School\",\n  \"address\": \"Somewhere\",\n  \"latitude\": 999,\n  \"longitude\": -999\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/addSchool",
+              "host": ["{{baseUrl}}"],
+              "path": ["addSchool"]
+            },
+            "description": "Sends latitude 999 and longitude -999, both out of valid range."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 422', function () {",
+                  "    pm.response.to.have.status(422);",
+                  "});",
+                  "",
+                  "pm.test('Errors for latitude and longitude', function () {",
+                  "    var fields = pm.response.json().errors.map(function(e) { return e.field; });",
+                  "    pm.expect(fields).to.include('latitude');",
+                  "    pm.expect(fields).to.include('longitude');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "422 Validation Error",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Validation failed\",\n  \"errors\": [\n    { \"field\": \"latitude\",  \"message\": \"Latitude must be a number between -90 and 90\" },\n    { \"field\": \"longitude\", \"message\": \"Longitude must be a number between -180 and 180\" }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "List Schools",
+      "item": [
+        {
+          "name": "List Schools - Near New Delhi",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/listSchools?latitude=28.6139&longitude=77.2090",
+              "host": ["{{baseUrl}}"],
+              "path": ["listSchools"],
+              "query": [
+                { "key": "latitude",  "value": "28.6139",  "description": "New Delhi latitude" },
+                { "key": "longitude", "value": "77.2090",  "description": "New Delhi longitude" }
+              ]
+            },
+            "description": "Fetches all schools sorted by distance from New Delhi (28.6139, 77.2090).\n\nThe closest school appears first. Each result includes a distance_km field."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Data is an array', function () {",
+                  "    var body = pm.response.json();",
+                  "    pm.expect(body.data).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Each school has distance_km field', function () {",
+                  "    var schools = pm.response.json().data;",
+                  "    schools.forEach(function(school) {",
+                  "        pm.expect(school).to.have.property('distance_km');",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test('Schools are sorted by distance ascending', function () {",
+                  "    var schools = pm.response.json().data;",
+                  "    for (var i = 1; i < schools.length; i++) {",
+                  "        pm.expect(schools[i].distance_km).to.be.at.least(schools[i - 1].distance_km);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/listSchools?latitude=28.6139&longitude=77.2090",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["listSchools"],
+                  "query": [
+                    { "key": "latitude", "value": "28.6139" },
+                    { "key": "longitude", "value": "77.2090" }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Schools fetched and sorted by proximity\",\n  \"data\": [\n    {\n      \"id\": 1,\n      \"name\": \"Delhi Public School\",\n      \"address\": \"Mathura Road, New Delhi, Delhi 110003\",\n      \"latitude\": 28.545,\n      \"longitude\": 77.259,\n      \"distance_km\": 8.2341\n    },\n    {\n      \"id\": 2,\n      \"name\": \"The Doon School\",\n      \"address\": \"Mall Road, Dehradun, Uttarakhand 248001\",\n      \"latitude\": 30.3204,\n      \"longitude\": 78.0297,\n      \"distance_km\": 253.1842\n    },\n    {\n      \"id\": 4,\n      \"name\": \"La Martiniere College\",\n      \"address\": \"La Martiniere Road, Lucknow, Uttar Pradesh 226001\",\n      \"latitude\": 26.8509,\n      \"longitude\": 80.9462,\n      \"distance_km\": 451.7203\n    },\n    {\n      \"id\": 3,\n      \"name\": \"Bishop Cotton School\",\n      \"address\": \"Circular Road, Shimla, Himachal Pradesh 171001\",\n      \"latitude\": 31.1048,\n      \"longitude\": 77.1734,\n      \"distance_km\": 280.9654\n    },\n    {\n      \"id\": 5,\n      \"name\": \"Cathedral and John Connon School\",\n      \"address\": \"Fort, Mumbai, Maharashtra 400001\",\n      \"latitude\": 18.933,\n      \"longitude\": 72.8353,\n      \"distance_km\": 1148.6411\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Schools - Near Mumbai",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/listSchools?latitude=19.0760&longitude=72.8777",
+              "host": ["{{baseUrl}}"],
+              "path": ["listSchools"],
+              "query": [
+                { "key": "latitude",  "value": "19.0760", "description": "Mumbai latitude" },
+                { "key": "longitude", "value": "72.8777", "description": "Mumbai longitude" }
+              ]
+            },
+            "description": "Fetches all schools sorted by distance from Mumbai (19.0760, 72.8777)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Data is an array', function () {",
+                  "    pm.expect(pm.response.json().data).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Schools are sorted by distance ascending', function () {",
+                  "    var schools = pm.response.json().data;",
+                  "    for (var i = 1; i < schools.length; i++) {",
+                  "        pm.expect(schools[i].distance_km).to.be.at.least(schools[i - 1].distance_km);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Schools fetched and sorted by proximity\",\n  \"data\": [\n    {\n      \"id\": 5,\n      \"name\": \"Cathedral and John Connon School\",\n      \"address\": \"Fort, Mumbai, Maharashtra 400001\",\n      \"latitude\": 18.933,\n      \"longitude\": 72.8353,\n      \"distance_km\": 16.2847\n    },\n    {\n      \"id\": 4,\n      \"name\": \"La Martiniere College\",\n      \"address\": \"La Martiniere Road, Lucknow, Uttar Pradesh 226001\",\n      \"latitude\": 26.8509,\n      \"longitude\": 80.9462,\n      \"distance_km\": 1138.8912\n    },\n    {\n      \"id\": 1,\n      \"name\": \"Delhi Public School\",\n      \"address\": \"Mathura Road, New Delhi, Delhi 110003\",\n      \"latitude\": 28.545,\n      \"longitude\": 77.259,\n      \"distance_km\": 1156.9401\n    },\n    {\n      \"id\": 3,\n      \"name\": \"Bishop Cotton School\",\n      \"address\": \"Circular Road, Shimla, Himachal Pradesh 171001\",\n      \"latitude\": 31.1048,\n      \"longitude\": 77.1734,\n      \"distance_km\": 1389.5123\n    },\n    {\n      \"id\": 2,\n      \"name\": \"The Doon School\",\n      \"address\": \"Mall Road, Dehradun, Uttarakhand 248001\",\n      \"latitude\": 30.3204,\n      \"longitude\": 78.0297,\n      \"distance_km\": 1400.2267\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Schools - Missing Parameters",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/listSchools",
+              "host": ["{{baseUrl}}"],
+              "path": ["listSchools"]
+            },
+            "description": "Calls /listSchools without any query params. Should return 422."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 422', function () {",
+                  "    pm.response.to.have.status(422);",
+                  "});",
+                  "",
+                  "pm.test('Both params reported missing', function () {",
+                  "    var fields = pm.response.json().errors.map(function(e) { return e.field; });",
+                  "    pm.expect(fields).to.include('latitude');",
+                  "    pm.expect(fields).to.include('longitude');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "422 Validation Error",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Validation failed\",\n  \"errors\": [\n    { \"field\": \"latitude\",  \"message\": \"latitude is required\" },\n    { \"field\": \"longitude\", \"message\": \"longitude is required\" }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Schools - Invalid Latitude",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/listSchools?latitude=abc&longitude=72.8777",
+              "host": ["{{baseUrl}}"],
+              "path": ["listSchools"],
+              "query": [
+                { "key": "latitude",  "value": "abc" },
+                { "key": "longitude", "value": "72.8777" }
+              ]
+            },
+            "description": "Sends a non-numeric string for latitude. Should return 422."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 422', function () {",
+                  "    pm.response.to.have.status(422);",
+                  "});",
+                  "",
+                  "pm.test('Error is on latitude field', function () {",
+                  "    var fields = pm.response.json().errors.map(function(e) { return e.field; });",
+                  "    pm.expect(fields).to.include('latitude');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "422 Validation Error",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Validation failed\",\n  \"errors\": [\n    { \"field\": \"latitude\", \"message\": \"Latitude must be a number between -90 and 90\" }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "404 - Unknown Route",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/unknown",
+              "host": ["{{baseUrl}}"],
+              "path": ["unknown"]
+            },
+            "description": "Hits a route that does not exist. Should return 404."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 404', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "404 Not Found",
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Route not found: GET /unknown\"\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
